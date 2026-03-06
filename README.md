@@ -61,5 +61,29 @@ Name - String
 Age - Integer
 Height - double
 ```
+## Solution 2
+```
+data = [("New York", 10.0),
+            ("New York", 12.0),
+            ("Los Angeles", 20.0),
+            ("Los Angeles", 22.0),
+            ("San Francisco", 15.0),
+            ("San Francisco", 18.0
+)]
 
+schema = StructType([ \
+StructField("city", StringType(), True), \
+StructField("temperature", DoubleType(), True) \
+])
+
+df = spark.createDataFrame(data=data, schema=schema)
+df2 = df.groupBy("city") \
+.agg(avg("temperature").alias("avg_temp"), \
+sum("temperature").alias("total_temp"), \
+count("temperature").alias("num_measurement")) \
+.where(col("total_temp") > 30) \
+.orderBy(col("city").asc()
+
+df2.show(truncate=False)
+```
 
