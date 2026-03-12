@@ -43,23 +43,29 @@ Df2.show(truncate=False)
 ```
 ## Question 2
 ```
-Customer Data Cleaning
-Problem Statement
-● As a data engineer you are given the task to clean the customer data
-● Your pipeline should remove all the duplicates records
-● And also remove those records which are duplicated on the basis of height and age
+City Temperature Analysis
+Problem Statement	
+- As a data engineer you are supposed to prepare the data from temp analysis
+- Your pipeline should return data in form of following columns
+○	city
+○	avg_temperature
+○	total_temperature
+○	num_measurements
+- You should return metrics for only those cities when total_temperature is greater than 30
+- And output should be sorted on city in ascending order
 
-**Data**
-Smith,23,5.3
-Rashmi,27,5.8
-Smith,23,5.3
-Payal,27,5.8
-Megha,27,5.4
+Data
+ New York , 10.0  
+ New York , 12.0 
+ Los Angeles , 20.0  
+ Los Angeles , 22.0 
+ San Francisco , 15.0  
+ San Francisco , 18.0
 Metadata- columns
 
-Name - String
-Age - Integer
-Height - double
+city - String
+temperature - Double
+
 ```
 ## Solution 2
 ```
