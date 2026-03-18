@@ -109,12 +109,12 @@ salary long
 
 Write a pyspark program which reads the above file from hadoop and introduces a new column in the existing dataframe with name as doubleSalary which should have values twice as the existing salary. Convert the data into a parquet file named department.parquet. You can store this converted parquet file either on the local file system or on hadoop.
 Create Department.txt in /home/takeo dir
-○	nano Department.txt
-○	ctrl + s
-○	ctrl + x
+nano Department.txt
+ctrl + s
+ctrl + x
 
-○	hadoop fs -mkdir -p /data/spark/test
-○	hadoop fs -put ~/Department.txt /data/spark/test
+hadoop fs -mkdir -p /data/spark/test
+hadoop fs -put ~/Department.txt /data/spark/test
 
 schema = StructType() \
 .add("dept_name",StringType(),True) \
@@ -164,10 +164,8 @@ jsonSQL.show()
 |     Anna|     F|
 +---------+------+
 ```
-
-
-
-Q3.
+## Question 5:
+```
 employee.json
 {"employee_name":"James","department":"Sales","salary":3000}
 {"employee_name":"Michael","department":"Sales","salary":4600}
@@ -182,25 +180,23 @@ employee.json
 
 
 
-Write a pyspark program which read employee.json and do the followings
-1.	Generate an orc file partitioned on a department for distinct employees.
-•	df = spark.read.json("file:///home/takeo/employee.json")
-•	df_distinct = df.distinct()
+1. Write a pyspark program which read employee.json and do the followings
+Generate an orc file partitioned on a department for distinct employees.
+df = spark.read.json("file:///home/takeo/employee.json")
+df_distinct = df.distinct()
+df_distinct.write.mode("overwrite").partitionBy("department").format("orc").save("file:///home/takeo/orc/department_part”)
 
-•	df_distinct.write.mode("overwrite").partitionBy("department").format("orc").save("file:///home/takeo/orc/department_part”)
+2. Return departments names in descending orders with their mean salary. 
+df = spark.read.json("file:///home/takeo/employee.json")
+df.createOrReplaceTempView("employee")
 
-2.	Return departments names in descending orders with their mean salary. 
-
-•	df = spark.read.json("file:///home/takeo/employee.json")
-•	df.createOrReplaceTempView("employee")
-
-•	jsonSQL = spark.sql(“Select department, AVG(salary) AS avg_salary FROM employee GROUP BY department ORDER BY department DESC”)
-
-•	jsonSQL.show()
+jsonSQL = spark.sql(“Select department, AVG(salary) AS avg_salary FROM employee GROUP BY department ORDER BY department DESC”)
+jsonSQL.show()
+```
 
 
-
-Q4.
+## Question 6:
+```
 employee.json
 {"emp_id":1,"name":"Smith","superior_emp_id":-1,"year_joined":"2018","emp_dept_id":"10","gender":"M","salary":3000}
 {"emp_id":2,"name":"Rose","superior_emp_id":1,"year_joined":"2010","emp_dept_id":"20","gender":"M","salary":4000}
@@ -219,16 +215,16 @@ department.json
 
 Write a pyspark program which collects all the department names, departments max salary and number of employees in each department and persist collected data into a partitioned hive table with parquet as internal file format for hive. And dept_name as a hive table partitioned column. And part_department as hive table name.
 
-•	df_employee = spark.read.json("file:///home/takeo/employee.json")
-•	df_department = spark.read.json("file:///home/takeo/department.json")
-•	
-•	df_employee.createOrReplaceTempView("employee")
-•	df_department.createOrReplaceTempView("department")
+df_employee = spark.read.json("file:///home/takeo/employee.json")
+df_department = spark.read.json("file:///home/takeo/department.json")
 
-•	jsonSQL = spark.sql("SELECT d.dept_name, MAX(e.salary) AS max_salary, COUNT(e.emp_dept_id) AS employee_count FROM employee AS e INNER JOIN department AS d ON CAST(e.emp_dept_id AS INT) = d.dept_id GROUP BY d.dept_name")
-•	jsonSQL.show()
+df_employee.createOrReplaceTempView("employee")
+df_department.createOrReplaceTempView("department")
 
-•	jsonSQL.write.mode("overwrite").partitionBy("dept_name").format("parquet").saveAsTable("default.part_department")
+jsonSQL = spark.sql("SELECT d.dept_name, MAX(e.salary) AS max_salary, COUNT(e.emp_dept_id) AS employee_count FROM employee AS e INNER JOIN department AS d ON CAST(e.emp_dept_id AS INT) = d.dept_id GROUP BY d.dept_name")
+jsonSQL.show()
+
+jsonSQL.write.mode("overwrite").partitionBy("dept_name").format("parquet").saveAsTable("default.part_department")
 
 
 Expected output data in hive table
@@ -239,8 +235,9 @@ Expected output data in hive table
 |Marketing|     4000|             1|
 |       IT|       -1|             1|
 +---------+---------+--------------+
-
-Q5.
+```
+## Question 7:
+```
 Create a file simple-zipcodes.csv for below data 
 RecordNumber,Country,City,Zipcode,State
 1,US,PARC PARQUE,704,PR
@@ -264,11 +261,12 @@ RecordNumber,Country,City,Zipcode,State
 76512,US,ASHEBORO,27203,NC
 76513,US,ASHEBORO,27204,NC
 
-•	nano simple-zipcodes.csv
-•	ctrl + s
-•	ctrl + x
-•	df = spark.read.csv(“file:///home/takeo/simple-zipcodes.csv”, header=True, inferschema=True)
-•	df.show()
+nano simple-zipcodes.csv
+ctrl + s
+ctrl + x
+
+df = spark.read.csv(“file:///home/takeo/simple-zipcodes.csv”, header=True, inferschema=True)
+df.show()
 
 from pyspark.sql import SparkSession
 
@@ -277,21 +275,18 @@ spark = SparkSession.builder \
     .enableHiveSupport() \
     .getOrCreate()
 
-
-
-Write a python program for followings
-●	Read the above data and generate a new sample data with a sample size of 50 %.
+1. Read the above data and generate a new sample data with a sample size of 50 %.
 sample_df = df.sample(withReplacement=False, fraction=0.5)
 sample_df.show()
 
-●	Create a hive partitioned table on state and city with maximum 3 records in each data file within the partitions.  
+2. Create a hive partitioned table on state and city with maximum 3 records in each data file within the partitions.  
 
 sample_df.write.mode(“overwrite”).partitionBy(“State”, “City”).option(“maxRecordsPerFile”=3).format(“parquet”).savAsTable(“default.zipcodes_part”)
 
-●	Run a hive sql in pyspark to get the data for states other than AL and cities other than SPRINGVILLE.
+3. Run a hive sql in pyspark to get the data for states other than AL and cities other than SPRINGVILLE.
 
 result_df = spark.sql(“SELECT * FROM default.zipcodes_part WHERE State != ‘AL’ AND City != ‘SPRINGVILLE’”)
 result_df.show()
-<img width="454" height="690" alt="image" src="https://github.com/user-attachments/assets/8a008c13-d2a8-4adb-8044-ff1fc95bb19c" />
+```
 
 
