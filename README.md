@@ -139,7 +139,7 @@ Expected data in department.parquet
 +---------+------+------------+
 ```
 
-# Question 4: 
+## Question 4: 
 ```
 student.json
 {"name":{"firstname":"James","middlename":"","lastname":"Smith"},"languages":["Java","Scala","C++"],"state":"OH","gender":"M"}
