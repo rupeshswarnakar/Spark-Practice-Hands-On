@@ -288,5 +288,73 @@ sample_df.write.mode(“overwrite”).partitionBy(“State”, “City”).optio
 result_df = spark.sql(“SELECT * FROM default.zipcodes_part WHERE State != ‘AL’ AND City != ‘SPRINGVILLE’”)
 result_df.show()
 ```
+## Question 8:
+```
+-> Create pyspark_sales_etl.py
+
+A general pipeline idea:
+  1. Create raw sales data
+  2. Clean and transform columns
+  3. Add revenue column
+  4. Categorize order size
+  5. Aggregate by region and category
+  6. Save clean and summary outputs as parquet
+
+Data & Schema:
+data = [
+    (1, "2026-04-01", "East", "Laptop", "Electronics", 2, 1200.0),
+    (2, "2026-04-01", "West", "Phone", "Electronics", 5, 800.0),
+    (3, "2026-04-02", "East", "Shoes", "Fashion", 10, 120.0),
+    (4, "2026-04-02", "South", "Watch", "Fashion", 3, 250.0),
+    (5, "2026-04-03", "West", "TV", "Electronics", 1, 1500.0),
+    (6, "2026-04-03", "North", "Jacket", "Fashion", 4, 200.0),
+    (7, "2026-04-04", "East", "Tablet", "Electronics", None, 600.0),
+    (8, "2026-04-04", "South", "Bag", "Fashion", 6, None),
+]
+
+columns = [
+    "order_id",
+    "order_date",
+    "region",
+    "product",
+    "category",
+    "quantity",
+    "unit_price"
+]
+```
+
+## Solution 8:
+```
+# Import libraries:
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import (col, to_date, when, sum as spark_sum, avg, count, round as spark_round)
+
+spark = SparkSession.builder.appName("Sales_ETL_Mini_Project").getOrCreate()
+
+raw_df = spark.createDataFrame(data, columns)
+raw_df.show()
+
+# Step 1: Clean data
+clean_df = (
+    raw_df
+    .withColumn("order_date", to_date(col("order_date"), "yyyy-MM-dd"))
+    .fillna({"quantity": 0, "unit_price": 0.0})
+)
+
+# Step 2: Add derived columns
+clean_df = (
+    clean_df
+    .withColumn("revenue", col("quantity") * col("unit_price"))
+    .withColumn(
+        "order_size",
+        when(col("quantity") >= 8, "Large")
+        .when(col("quantity") >= 3, "Medium")
+        .otherwise("Small")
+    )
+)
+
+print("Cleaned and Transformed Data:")
+clean_df.show()
+```
 
 
