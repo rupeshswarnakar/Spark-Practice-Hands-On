@@ -290,7 +290,7 @@ result_df.show()
 ```
 ## Question 8:
 ```
--> Create pyspark_sales_etl.py
+Q. Create pyspark_sales_etl.py
 
 A general pipeline idea:
   1. Create raw sales data
@@ -355,6 +355,23 @@ clean_df = (
 
 print("Cleaned and Transformed Data:")
 clean_df.show()
+
+# Step 3: Aggregation by region and category
+summary_df = (
+    clean_df
+    .groupBy("region", "category")
+    .agg(
+        count("order_id").alias("num_orders"),
+        spark_sum("quantity").alias("total_quantity"),
+        spark_round(spark_sum("revenue"), 2).alias("total_revenue"),
+        spark_round(avg("revenue"), 2).alias("avg_revenue_per_order")
+    )
+    .orderBy("region", "category")
+)
+
+print("Summary by Region and Category:")
+summary_df.show()
+
 ```
 
 
