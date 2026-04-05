@@ -372,6 +372,18 @@ summary_df = (
 print("Summary by Region and Category:")
 summary_df.show()
 
+# Step 4: Write outputs
+clean_df.write.mode("overwrite").parquet("output/clean_sales")
+summary_df.write.mode("overwrite").parquet("output/sales_summary")
+
+spark.stop()
+
+Key Learning:
+• uses fillna
+• uses to_date
+• adds business logic with when
+• does grouped aggregations
+• writes multiple parquet outputs
 ```
 
 
