@@ -290,7 +290,7 @@ result_df.show()
 ```
 ## Question 8:
 ```
-Q. Create pyspark_sales_etl.py
+Q. Create pyspark_sales_etl.py?
 
 A general pipeline idea:
   1. Create raw sales data
@@ -387,7 +387,7 @@ Key Learning:
 ```
 ## Question 9:
 ```
-Create Sales Data Pipeline for below Data and Schema?
+Q. Create Sales Data Pipeline for below Data and Schema?
 data = [
     ("2024-01-01", "CA", "Laptop", 2, 1000),
     ("2024-01-01", "CA", "Phone", 5, 500),
@@ -417,4 +417,17 @@ c. Aggregation (core logic)
 d. Create Gold Layer
    - dim_state
    - fact_sales
+```
+## Solution 9:
+```
+# Creating dataframe
+df = spark.createDataFrame(data, columns)
+
+df.show()
+
+# Clean data
+clean_df = (df.fillna({"quantity":0}).withColumn("date", todate(col("date"), "yyyy-MM-dd")))
+
+clean_df.printSchema()
+clean_df.show()
 ```
