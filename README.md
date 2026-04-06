@@ -408,7 +408,7 @@ a. Clean the data
 b. Create new column
   - revenue = quantity * price
 
-c. Aggregation (core logic)
+c. Aggregation tasks
    - Total revenue per state
    - Top selling product per state
    - Daily total revenue
@@ -422,12 +422,41 @@ d. Create Gold Layer
 ```
 # Creating dataframe
 df = spark.createDataFrame(data, columns)
-
 df.show()
 
-# Clean data
+a. Clean data
 clean_df = (df.fillna({"quantity":0}).withColumn("date", todate(col("date"), "yyyy-MM-dd")))
 
 clean_df.printSchema()
 clean_df.show()
+
+b. Create revenue column
+sale_df = clean_df.withColumn("revenue", col("quantity") * col("price"))
+sale_df.show()
+
+c. Aggregation
+# Total revenue per state 
+revenue_per_state = sale_df.groupBy("state").agg(spark_sum("revenue").alias("Total_revenue")).orderBy("state")
+
+revenue_per_state.show()
+
+# Top selling product per state
+product_state_revenue = sale_df.groupBy("state", "product").agg(spark_sum("revenue").alias("product_revenue")
+
+window_spec = Window.partitionBy("state").orderBy(desc("product_revenue"))
+
+top_product_per_state = 
+	product_state_revenue
+	.withColumn("rank", row_number().over(window_spec))
+	.filter(col("rank") == 1)
+	.drop("rank")
+	.orderBy("state")
+
+top_product_per_state.show()
+
+# Daily total revenue
+daily_total_revenue = sale_df.groupBy("date").agg(spark_sum("revenue").alias("total_daily_revenue")).orderBy("date")
+
+daily_total_revenue.show()
+
 ```
