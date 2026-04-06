@@ -417,6 +417,8 @@ c. Aggregation tasks
 d. Create Gold Layer
    - dim_state
    - fact_sales
+
+e. Write to parquet file format
 ```
 ## Solution 9:
 ```
@@ -459,4 +461,22 @@ daily_total_revenue = sale_df.groupBy("date").agg(spark_sum("revenue").alias("to
 
 daily_total_revenue.show()
 
+# Top 2 highest revenue days
+top_2_days = daily_total_revenue.orderBy(desc("total_daily_revenue")).limit(2)
+
+top_2_days.show()
+
+d. Create Gold Layer
+# Create dim_state
+dim_state = sale_df.select("state").dropDuplicates().orderBy("state")
+
+# Create fact_sales
+fact_sales = sale_df.select("date", "state", "product", "quantity", "price", "revenue")
+
+e. Write to parquet file format
+revenue_per_state.write.mode("overwrite").parquet("output/revenue_per_state")
+product_state_revenue.write.mode("overwrite").parquet("output/product_state_revenue")
+top_product_per_state.write.mode("overwrite").parquet("output/top_product_per_state")
+dim_state.write.mode("overwrite").parquet("output/dim_state")
+fact_sales.write.mode("overwrite").parquet("output/fact_sales")
 ```
