@@ -385,5 +385,36 @@ Key Learning:
 • does grouped aggregations
 • writes multiple parquet outputs
 ```
+## Question 9:
+```
+Create Sales Data Pipeline for below Data and Schema?
+data = [
+    ("2024-01-01", "CA", "Laptop", 2, 1000),
+    ("2024-01-01", "CA", "Phone", 5, 500),
+    ("2024-01-02", "NY", "Laptop", 1, 1000),
+    ("2024-01-02", "NY", "Phone", 2, 500),
+    ("2024-01-03", "CA", "Laptop", 3, 1000),
+    ("2024-01-03", "TX", "Tablet", 4, 300),
+    ("2024-01-04", "TX", "Laptop", None, 1000),
+]
 
+columns = ["date", "state", "product", "quantity", "price"]
 
+**Tasks:**
+a. Clean the data
+  - Remove or handle NULL quantity
+  - Convert date → proper date type
+
+b. Create new column
+  - revenue = quantity * price
+
+c. Aggregation (core logic)
+   - Total revenue per state
+   - Top selling product per state
+   - Daily total revenue
+   - Top 2 highest revenue days
+
+d. Create Gold Layer
+   - dim_state
+   - fact_sales
+```
