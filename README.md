@@ -480,3 +480,55 @@ top_product_per_state.write.mode("overwrite").parquet("output/top_product_per_st
 dim_state.write.mode("overwrite").parquet("output/dim_state")
 fact_sales.write.mode("overwrite").parquet("output/fact_sales")
 ```
+## Question 10:
+Real-Time Fraud Detection (PySpark Streaming)
+```
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, window, count
+import uuid
+
+# 1. Spark session
+spark = SparkSession.builder \
+    .appName("Fraud Detection Streaming") \
+    .getOrCreate()
+
+spark.sparkContext.setLogLevel("ERROR")
+
+# 2. Read streaming transaction data
+df = spark.readStream \
+    .option("header", True) \
+    .schema("user_id STRING, amount DOUBLE, timestamp TIMESTAMP") \
+    .csv("data/transactions/")
+
+# 3. Rule 1: High-value transaction (fraud)
+high_value = df.filter(col("amount") > 10000)
+
+# 4. Rule 2: Too many transactions in short time
+txn_count = df.groupBy(
+    col("user_id"),
+    window(col("timestamp"), "1 minute")
+).agg(count("*").alias("txn_count"))
+
+frequent_txn = txn_count.filter(col("txn_count") > 5)
+
+# 5. Write fraud alerts
+def write_alerts(batch_df, batch_id):
+    print(f"Processing batch {batch_id}")
+    
+    batch_df.write \
+        .mode("append") \
+        .json("output/fraud_alerts/" + str(uuid.uuid4()))
+
+# 6. Start streaming queries
+query1 = high_value.writeStream \
+    .foreachBatch(write_alerts) \
+    .option("checkpointLocation", "checkpoint/high_value/") \
+    .start()
+
+query2 = frequent_txn.writeStream \
+    .foreachBatch(write_alerts) \
+    .option("checkpointLocation", "checkpoint/frequent_txn/") \
+    .start()
+
+spark.streams.awaitAnyTermination()
+```
