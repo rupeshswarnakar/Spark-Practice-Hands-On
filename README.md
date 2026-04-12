@@ -531,4 +531,10 @@ query2 = frequent_txn.writeStream \
     .start()
 
 spark.streams.awaitAnyTermination()
+
+Key Learnings
+- Window functions in streaming
+- Real-time aggregations
+- Event-time processing
+- Streaming pipelines
 ```
