@@ -1,6 +1,5 @@
 # Spark-Practice-Hands-On
 
-## PySpark functions and their use:
 ## 1. Create Spark session
 ```
 from pyspark.sql import SparkSession
