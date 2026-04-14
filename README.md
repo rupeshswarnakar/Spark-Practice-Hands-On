@@ -1,5 +1,15 @@
 # Spark-Practice-Hands-On
 
+## PySpark functions and their use:
+1. Create Spark session
+```
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .appName("PySpark Interview Practice") \
+    .getOrCreate()
+```
+
 ## Question 1
 ```
 Customer Data Cleaning
