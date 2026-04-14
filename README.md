@@ -1,7 +1,7 @@
 # Spark-Practice-Hands-On
 
 ## PySpark functions and their use:
-1. Create Spark session
+## 1. Create Spark session
 ```
 from pyspark.sql import SparkSession
 
@@ -9,7 +9,7 @@ spark = SparkSession.builder \
     .appName("PySpark Interview Practice") \
     .getOrCreate()
 ```
-2. Sample DataFrame
+## 2. Sample DataFrame
 ```
 from pyspark.sql import Row
 
@@ -24,37 +24,37 @@ data = [
 df = spark.createDataFrame(data)
 df.show()
 ```
-3. select()
+## 3. select()
 ```
 df.select("name", "salary").show()
 ```
-4. filter() / where()
+## 4. filter() / where()
 ```
 df.filter(df.salary > 6000).show()
 
 df.where(df.dept == "IT").show()
 ```
-5. withColumn()
+## 5. withColumn()
 ```
 from pyspark.sql.functions import col
 
 df.withColumn("bonus", col("salary") * 0.10).show()
 ```
-6. drop()
+## 6. drop()
 ```
 df.drop("age").show()
 ```
-7. distinct()
+## 7. distinct()
 ```
 df.select("dept").distinct().show()
 ```
-8. orderBy() / sort()
+## 8. orderBy() / sort()
 ```
 df.orderBy("salary").show()
 
 df.orderBy(col("salary").desc()).show()
 ```
-9. groupBy()
+## 9. groupBy()
 ```
 from pyspark.sql.functions import sum as spark_sum, avg, max as spark_max
 
@@ -64,11 +64,11 @@ df.groupBy("dept").agg(
     spark_max("salary").alias("max_salary")
 ).show()
 ```
-10. count()
+## 10. count()
 ```
 df.groupBy("dept").count().show()
 ```
-11. join()
+## 11. join()
 ```
 dept_data = [
     Row(dept="HR", manager="John"),
@@ -80,7 +80,7 @@ dept_df = spark.createDataFrame(dept_data)
 
 df.join(dept_df, on="dept", how="inner").show()
 ```
-12. union()
+## 12. union()
 ```
 new_data = [
     Row(id=6, name="Frank", dept="IT", salary=7500, age=29)
@@ -91,19 +91,19 @@ df2 = spark.createDataFrame(new_data)
 df.union(df2).show()
 ```
 
-13. dropDuplicates()
+## 13. dropDuplicates()
 ```
 df.dropDuplicates(["dept"]).show()
 ```
 
-14. alias()
+## 14. alias()
 ```
 emp = df.alias("emp")
 dept = dept_df.alias("dept")
 
 emp.join(dept, col("emp.dept") == col("dept.dept"), "inner").show()
 ```
-15. when() / otherwise()
+## 15. when() / otherwise()
 ```
 from pyspark.sql.functions import when
 
@@ -114,17 +114,17 @@ df.withColumn(
     .otherwise("Low")
 ).show()
 ```
-16. lit()
+## 16. lit()
 ```
 from pyspark.sql.functions import lit
 
 df.withColumn("country", lit("USA")).show()
 ```
-17. cast()
+## 17. cast()
 ```
 df.withColumn("salary_str", col("salary").cast("string")).show()
 ```
-18. String functions
+## 18. String functions
 ```
 from pyspark.sql.functions import upper, lower, concat, length, trim
 
@@ -135,13 +135,13 @@ df.withColumn("name_len", length(col("name"))).show()
 df.withColumn("clean_name", trim(col("name"))).show()
 ```
 
-19. Null handling
+## 19. Null handling
 ```
 df.dropna().show()
 df.fillna({"dept": "Unknown", "salary": 0}).show()
 ```
 
-20. Window functions
+## 20. Window functions
 ```
 from pyspark.sql.window import Window
 from pyspark.sql.functions import row_number, rank, dense_rank
@@ -153,7 +153,7 @@ df.withColumn("rank", rank().over(window_spec)).show()
 df.withColumn("dense_rank", dense_rank().over(window_spec)).show()
 ```
 
-21. collect_list() and collect_set()
+## 21. collect_list() and collect_set()
 ```
 from pyspark.sql.functions import collect_list, collect_set
 
@@ -163,7 +163,7 @@ df.groupBy("dept").agg(
 ).show(truncate=False)
 ```
 
-22. explode()
+## 22. explode()
 ```
 from pyspark.sql.functions import explode
 
@@ -176,7 +176,7 @@ array_df = spark.createDataFrame(array_data)
 
 array_df.withColumn("skill", explode(col("skills"))).show()
 ```
-23. split()
+## 23. split()
 ```
 from pyspark.sql.functions import split
 
@@ -190,11 +190,11 @@ text_df = spark.createDataFrame(text_data)
 text_df.withColumn("tag_array", split(col("tags"), ",")).show(truncate=False)
 ```
 
-24. explode(split())
+## 24. explode(split())
 ```
 text_df.withColumn("tag", explode(split(col("tags"), ","))).show()
 ```
-25. regexp_replace()
+## 25. regexp_replace()
 ```
 from pyspark.sql.functions import regexp_replace
 
@@ -209,7 +209,7 @@ dirty_df.withColumn(
     regexp_replace(col("phone"), "[^0-9]", "")
 ).show()
 ```
-26. Date functions
+## 26. Date functions
 ```
 from pyspark.sql.functions import current_date, datediff, to_date, year, month
 
