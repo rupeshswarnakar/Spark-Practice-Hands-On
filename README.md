@@ -24,6 +24,125 @@ data = [
 df = spark.createDataFrame(data)
 df.show()
 ```
+3. select()
+```
+df.select("name", "salary").show()
+```
+4. filter() / where()
+```
+df.filter(df.salary > 6000).show()
+
+df.where(df.dept == "IT").show()
+```
+5. withColumn()
+```
+from pyspark.sql.functions import col
+
+df.withColumn("bonus", col("salary") * 0.10).show()
+```
+6. drop()
+```
+df.drop("age").show()
+```
+7. distinct()
+```
+df.select("dept").distinct().show()
+```
+8. orderBy() / sort()
+```
+df.orderBy("salary").show()
+
+df.orderBy(col("salary").desc()).show()
+```
+9. groupBy()
+```
+from pyspark.sql.functions import sum as spark_sum, avg, max as spark_max
+
+df.groupBy("dept").agg(
+    spark_sum("salary").alias("total_salary"),
+    avg("salary").alias("avg_salary"),
+    spark_max("salary").alias("max_salary")
+).show()
+```
+10. count()
+```
+df.groupBy("dept").count().show()
+```
+11. join()
+```
+dept_data = [
+    Row(dept="HR", manager="John"),
+    Row(dept="IT", manager="Sara"),
+    Row(dept="Finance", manager="Mike")
+]
+
+dept_df = spark.createDataFrame(dept_data)
+
+df.join(dept_df, on="dept", how="inner").show()
+```
+12. union()
+```
+new_data = [
+    Row(id=6, name="Frank", dept="IT", salary=7500, age=29)
+]
+
+df2 = spark.createDataFrame(new_data)
+
+df.union(df2).show()
+```
+
+13. dropDuplicates()
+```
+df.dropDuplicates(["dept"]).show()
+```
+
+14. alias()
+```
+emp = df.alias("emp")
+dept = dept_df.alias("dept")
+
+emp.join(dept, col("emp.dept") == col("dept.dept"), "inner").show()
+```
+15. when() / otherwise()
+```
+from pyspark.sql.functions import when
+
+df.withColumn(
+    "salary_level",
+    when(col("salary") >= 7000, "High")
+    .when(col("salary") >= 5500, "Medium")
+    .otherwise("Low")
+).show()
+```
+16. lit()
+```
+from pyspark.sql.functions import lit
+
+df.withColumn("country", lit("USA")).show()
+```
+17. cast()
+```
+df.withColumn("salary_str", col("salary").cast("string")).show()
+```
+18. String functions
+```
+from pyspark.sql.functions import upper, lower, concat, length, trim
+
+df.withColumn("name_upper", upper(col("name"))).show()
+df.withColumn("name_lower", lower(col("name"))).show()
+df.withColumn("full_info", concat(col("name"), lit("_"), col("dept"))).show()
+df.withColumn("name_len", length(col("name"))).show()
+df.withColumn("clean_name", trim(col("name"))).show()
+```
+
+19. Null handling
+```
+df.dropna().show()
+df.fillna({"dept": "Unknown", "salary": 0}).show()
+```
+
+
+
 
 ## Question 1
 ```
