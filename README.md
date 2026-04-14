@@ -9,6 +9,21 @@ spark = SparkSession.builder \
     .appName("PySpark Interview Practice") \
     .getOrCreate()
 ```
+2. Sample DataFrame
+```
+from pyspark.sql import Row
+
+data = [
+    Row(id=1, name="Alice", dept="HR", salary=5000, age=25),
+    Row(id=2, name="Bob", dept="IT", salary=7000, age=30),
+    Row(id=3, name="Charlie", dept="IT", salary=8000, age=35),
+    Row(id=4, name="David", dept="Finance", salary=6000, age=28),
+    Row(id=5, name="Eva", dept="HR", salary=5500, age=26),
+]
+
+df = spark.createDataFrame(data)
+df.show()
+```
 
 ## Question 1
 ```
