@@ -141,8 +141,93 @@ df.dropna().show()
 df.fillna({"dept": "Unknown", "salary": 0}).show()
 ```
 
+20. Window functions
+```
+from pyspark.sql.window import Window
+from pyspark.sql.functions import row_number, rank, dense_rank
 
+window_spec = Window.partitionBy("dept").orderBy(col("salary").desc())
 
+df.withColumn("row_num", row_number().over(window_spec)).show()
+df.withColumn("rank", rank().over(window_spec)).show()
+df.withColumn("dense_rank", dense_rank().over(window_spec)).show()
+```
+
+21. collect_list() and collect_set()
+```
+from pyspark.sql.functions import collect_list, collect_set
+
+df.groupBy("dept").agg(
+    collect_list("name").alias("employee_list"),
+    collect_set("name").alias("employee_set")
+).show(truncate=False)
+```
+
+22. explode()
+```
+from pyspark.sql.functions import explode
+
+array_data = [
+    Row(id=1, skills=["Python", "SQL"]),
+    Row(id=2, skills=["Spark", "AWS"])
+]
+
+array_df = spark.createDataFrame(array_data)
+
+array_df.withColumn("skill", explode(col("skills"))).show()
+```
+23. split()
+```
+from pyspark.sql.functions import split
+
+text_data = [
+    Row(id=1, tags="python,sql,spark"),
+    Row(id=2, tags="aws,hadoop,hive")
+]
+
+text_df = spark.createDataFrame(text_data)
+
+text_df.withColumn("tag_array", split(col("tags"), ",")).show(truncate=False)
+```
+
+24. explode(split())
+```
+text_df.withColumn("tag", explode(split(col("tags"), ","))).show()
+```
+25. regexp_replace()
+```
+from pyspark.sql.functions import regexp_replace
+
+dirty_data = [
+    Row(id=1, phone="(123)-456-7890")
+]
+
+dirty_df = spark.createDataFrame(dirty_data)
+
+dirty_df.withColumn(
+    "clean_phone",
+    regexp_replace(col("phone"), "[^0-9]", "")
+).show()
+```
+26. Date functions
+```
+from pyspark.sql.functions import current_date, datediff, to_date, year, month
+
+date_data = [
+    Row(id=1, join_date="2024-01-15"),
+    Row(id=2, join_date="2023-08-20")
+]
+
+date_df = spark.createDataFrame(date_data)
+
+date_df = date_df.withColumn("join_date", to_date(col("join_date")))
+
+date_df.withColumn("today", current_date()) \
+       .withColumn("days_diff", datediff(current_date(), col("join_date"))) \
+       .withColumn("join_year", year(col("join_date"))) \
+       .withColumn("join_month", month(col("join_date"))) \
+       .show()
+```
 
 ## Question 1
 ```
